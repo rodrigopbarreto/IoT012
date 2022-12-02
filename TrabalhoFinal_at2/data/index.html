@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IT012 - Gerenciador Wifi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="icon" type="image/png" href="favicon.png">
+</head>
+<body>
+  <div class="topnav">
+    <h1>IT012 - Gerenciador Wifi</h1>
+  </div>
+  <div class="content">
+    <div class="card-grid">
+      <div class="card">
+        <form action="/" method="POST">
+          <p>
+            <label for="ssid">SSID</label>
+            <input type="text" id ="ssid" name="ssid"><br>
+            <label for="password">Senha</label>
+            <input type="text" id ="password" name="password"><br>
+            <label for="thingspeak_channel">Thingspeak Channel</label>
+            <input type="text" id ="thingspeak_channel" name="thingspeak_channel"><br>
+            <label for="thingspeak_write_api_key">TS write API Key</label>
+            <input type="text" id ="thingspeak_write_api_key" name="thingspeak_write_api_key"><br>
+            <label for="device_name">Device Name</label>
+            <input type="text" id ="device_name" name="device_name"><br>
+            <input type ="submit" value ="Enviar">
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>  
+</body>
+</html>
