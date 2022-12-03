@@ -12,8 +12,6 @@
     Inclusões
 *******************************************************************************/
 
-
-
 #include <Arduino.h>
 #include "DHT.h"
 #include "esp_wifi.h"
@@ -23,14 +21,14 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_Sensor.h>
+
 extern "C" {
 #include "freertos/FreeRTOS.h"
 #include "freertos/timers.h"
 }
+
 #include <ArduinoJson.h>
 #include <AsyncMqttClient.h>
-
-
 
 #include <Fonts/FreeSerif9pt7b.h>
 
@@ -44,7 +42,7 @@ extern "C" {
 /*******************************************************************************
     Definições de constantes e variáveis globais
 *******************************************************************************/
-const char *WIFI_SSID = "it012-AP";     // Rede wifi AP para conexao inicial
+const char *WIFI_SSID = "Barreto-AP";     // Rede wifi AP para conexao inicial
 const char *WIFI_PASSWORD = "password";  // Senha rede AP
 WiFiClient client;
 
@@ -83,6 +81,11 @@ float g_pressure;
 #define OLED_ADDRESS (0x3C) // endereço I²C do display
 static Adafruit_SSD1306 display // objeto de controle do SSD1306
     (OLED_WIDTH, OLED_HEIGHT, &Wire, -1);
+
+// Configurações para acesso à um canal predefinido da ThingSpeak
+// unsigned long THINGSPEAK_CHANNEL_ID = 1964100;
+// const char *THINGSPEAK_WRITE_API_KEY = "5RTAN3QJF9C3Y6HA";
+// const char *THINGSPEAK_READ_API_KEY = "IJ54FN8KDJDG0OXR";
 
 /*******************************************************************************
     Implementação: Funções auxiliares
@@ -182,7 +185,7 @@ void serverOnPost(AsyncWebServerRequest *request)
         // Escreve WIFI_PASSWORD no arquivo
         writeFile(g_passwordPath, g_password.c_str());
       }
-      if (p->name() == "ts channel") {
+      if (p->name() == "thingspeak_channel") {
                 g_thingspeak_chan = p->value().c_str();
                 Serial.print("Canal do ThingSpeak definido como: ");
                 Serial.println(g_thingspeak_chan);
@@ -190,7 +193,7 @@ void serverOnPost(AsyncWebServerRequest *request)
                 // Escreve o canal do Thingspeak  no arquivo
                 writeFile(g_thingspeak_chanPath, g_thingspeak_chan.c_str());
             }
-      if (p->name() == "ts api write key") {
+      if (p->name() == "thingspeak_write_api_key") {
                 g_ts_api_write = p->value().c_str();
                 Serial.print("API write key do Thingspeak definida como: ");
                 Serial.println(g_ts_api_write);
@@ -198,9 +201,9 @@ void serverOnPost(AsyncWebServerRequest *request)
                 // Escreve a write key do Thongspeak no arquivo
                 writeFile(g_ts_api_writePath, g_ts_api_write.c_str());
             }
-      if (p->name() == "device name") {
+      if (p->name() == "device_name") {
                 g_device_name = p->value().c_str();
-                Serial.print("Nome do dispositivo definodo como: ");
+                Serial.print("Nome do dispositivo definido como: ");
                 Serial.println(g_device_name);
 
                 // Escreve nome do device no arquivo
@@ -267,16 +270,19 @@ esp_err_t sensorRead()
         Serial.printf("\r\n[sensorRead] Erro - leitura inválida...");
         return ESP_FAIL;
     } else {
+
+
         return ESP_OK;
     }
 }
+
 // Publica os dados no Thingspeak
 void sensorPublish()
 {
     int errorCode;
     ThingSpeak.setField(1, g_temperature);
     ThingSpeak.setField(2, g_humidity);
- 
+    
     errorCode = ThingSpeak.writeFields((long)g_thingspeak_chan.c_str(), g_ts_api_write.c_str());
     if (errorCode != 200) {
         Serial.println("Erro ao atualizar os canais - código HTTP: " + String(errorCode));
@@ -301,7 +307,7 @@ void setup()
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
 
-  // Carrega os valores lidos com o LittleFS
+  // Carrega os valores lidos com o LittleFS e os imprime
   g_ssid = readFile(g_ssidPath);
   g_password = readFile(g_passwordPath);
   g_thingspeak_chan = readFile(g_thingspeak_chanPath);
@@ -367,7 +373,8 @@ void loop()
             display.clearDisplay();
 
             // Mostra nome do dispositivo
-            display.setCursor(0, 0);
+            display.drawRoundRect(0, 8, 126, 16, 6, WHITE);
+            display.setCursor(14, 44);
             display.printf("%s", g_device_name.c_str());
 
             // Mostra Temperatura no display
@@ -395,3 +402,5 @@ void loop()
     }
 
 }
+
+
